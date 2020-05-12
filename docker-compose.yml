@@ -1,0 +1,35 @@
+version: '3'
+services:
+  api:
+    build: 
+      context: ./task-api
+      dockerfile: ./ForgeRock.Api.Web/Dockerfile
+    ports:
+      - "8000:80"
+    depends_on:
+      - redis
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+  worker1:
+    build:
+      context: ./worker
+    depends_on:
+      - redis
+      - api
+    environment:
+    - TASKNAME=task1
+  worker2:
+    build:
+      context: ./worker
+    depends_on:
+      - redis
+      - api
+    environment:
+    - TASKNAME=task2
+  app:
+    build:
+      context: ./task-app
+    ports:
+      - "1337:80"
